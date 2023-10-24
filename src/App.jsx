@@ -3,6 +3,22 @@ import "./App.css";
 import axios from 'axios';
 
 const App = () => {
+  const [isLoading, setIsLoading]     = useState(true);
+  const [factsData, setFactsData]     = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+
+  useEffect(() => {
+    axios
+    .get('https://63db4515b8e69785e47e7435.mockAPI.io/country')
+    .then((response) => {
+      setFactsData(response.data);
+      setIsLoading(false);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }, []);
+
   return (
     <div className="App">
       <header className="header">
@@ -16,6 +32,10 @@ const App = () => {
               name="search"
               id="search"
               placeholder="Search..."
+              value={searchInput}
+              onChange={(e) => {
+                setSearchInput(e.target.value);
+              }}
               required
             />
           </label>
@@ -23,22 +43,19 @@ const App = () => {
       </header>
 
       <main>
-        <section className="cards-wrapper">
-          <article className="card" key="index">
-            <h2 className="short-fact">Title</h2>
-            <p className="long-fact">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-            </p>
-            <p className="country-name">Country name</p>
-          </article>
-          <article className="card" key="index">
-            <h2 className="short-fact">Title</h2>
-            <p className="long-fact">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-            </p>
-            <p className="country-name">Country name</p>
-          </article>
-        </section>
+        {isLoading ? (
+          <p className="message">loading...</p>
+        ) : (
+          <section className="cards-wrapper">
+            {factsData.map((data) => (
+              <article className="card" key="index">
+                <h2 className="short-fact">{data.shortFact}</h2>
+                <p className="long-fact">{data.longFact}</p>
+                <p className="country-name">{data.country}</p>
+              </article>
+            ))}
+          </section>
+        )}
       </main>
     </div>
   );
